@@ -1,0 +1,107 @@
+# Plan: Hourly Brooklyn Weather Check (Schedule Skill Experiment)
+
+## Context
+
+Goal is to run a small, low-risk experiment with the Claude Code `schedule` skill — specifically to understand:
+- How scheduled remote agents are created and run
+- How they write files back to the repo via git
+- What cost/token tracking looks like
+
+A Brooklyn, NYC hourly weather check is the test task: simple, repeatable, zero risk to job-search data.
+
+---
+
+## Prerequisites (before running `/schedule`)
+
+### 1. GitHub Token
+Already set up: token file lives in `~/weather-bot/` with access scoped to `test_agentic_features` repo only.
+
+When invoking `/schedule`, read the token from that file and embed it in the source URL:
+```
+https://<TOKEN>@github.com/GordonOboh/test_agentic_features.git
+```
+
+> **Note:** Token travels to Anthropic's CCR cloud. Do not commit or log it.
+
+### 2. Target repo
+`https://github.com/GordonOboh/test_agentic_features` — dedicated agentic features experiment repo. Output files (`weather_bot/`) go here, not in `Claude_DS_Job_Search`.
+
+### 3. Anthropic Environment
+Create a **new** Anthropic environment for this experiment (separate from "DS Job search"). Do this via `https://claude.ai/code` → Environments → New. Name it e.g. `weather-bot-test`.
+
+---
+
+## New File: Weather Check Agent Definition
+
+**File:** `~/.claude/agents/weather-check.md`
+
+```markdown
+---
+name: "weather-check"
+description: "Fetch current weather for Brooklyn, NYC and log results + cost to repo."
+model: haiku
+---
+
+1. Fetch current weather for Brooklyn, NY using wttr.in (no API key needed):
+   curl "https://wttr.in/Brooklyn,NY?format=j1"
+
+2. Extract: condition, temperature (°F and °C), humidity, wind speed.
+
+3. Append one line to weather_bot/weather_log.txt:
+   [YYYY-MM-DD HH:MM:SS UTC] Brooklyn, NY | <condition> | <temp_F>°F / <temp_C>°C | Humidity: <humidity>% | Wind: <wind_speed>
+
+4. Append one line to weather_bot/schedule_cost.log:
+   [YYYY-MM-DD HH:MM:SS UTC] TASK=weather-check | MODEL=haiku | INPUT_TOKENS=<n> | OUTPUT_TOKENS=<n> | STATUS=ok
+
+5. git add weather_bot/weather_log.txt weather_bot/schedule_cost.log
+   git commit -m "chore: hourly weather check [skip ci]"
+   git push origin HEAD
+```
+
+---
+
+## Schedule Trigger
+
+Invoke via the `/schedule` skill with:
+- **Task:** run the `weather-check` agent
+- **Cadence:** every 1 hour (cron: `0 * * * *`)
+- **Source:** `https://<TOKEN>@github.com/GordonOboh/test_agentic_features.git`
+- **Environment:** new environment created (weather-bot-test)
+
+---
+
+## Output Files
+
+| File | Location | Content |
+|------|----------|---------|
+| Weather log | `weather_bot/weather_log.txt` | One line per hourly run |
+| Cost log | `weather_bot/schedule_cost.log` | Token counts + status per run |
+
+Both files are committed and pushed each run. To see results: `git pull` in test_agentic_features repo.
+
+---
+
+## Cost Estimate
+
+Model: `haiku` (cheapest). Each run:
+- One `curl` call to wttr.in (free, no API key)
+- ~500–800 input tokens, ~100 output tokens
+- Estimated: **< $0.001 per run** / ~$0.024/day
+
+---
+
+## Verification
+
+1. After `/schedule` creates the routine, check `https://claude.ai/code/scheduled` to confirm it appears
+2. After first run (~1 hour): navigate to test_agentic_features repo and pull to check weather_bot/ output files
+3. If files don't appear: check the run log at `https://claude.ai/code/scheduled` for errors (likely a git auth issue)
+
+---
+
+## Critical Files
+
+- New agent: `~/.claude/agents/weather-check.md` (created)
+- Target repo: `https://github.com/GordonOboh/test_agentic_features`
+- Weather log: `weather_bot/weather_log.txt` (created by agent, inside test_agentic_features)
+- Cost log: `weather_bot/schedule_cost.log` (created by agent, inside test_agentic_features)
+- Token file: `~/weather-bot/agentic_token.txt` (read locally to construct git URL)
