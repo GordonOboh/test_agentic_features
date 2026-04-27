@@ -4,7 +4,5 @@
 [2026-04-27 06:34:55 UTC] Brooklyn, NY | Unknown | 48°F / 9°C | Humidity: 73% | Wind: 4
 [2026-04-27 06:36:51 UTC] Brooklyn, NY | Unknown | 48°F / 9°C | Humidity: 73% | Wind: 4
 [2026-04-27 06:38:58 UTC] Brooklyn, NY | Unknown | 48°F / 9°C | Humidity: 73% | Wind: 4
-[2026-04-27 07:14:16 UTC] Brooklyn, NY |  | °F / °C | Humidity: % | Wind:  mph
-[2026-04-27 07:14:21 UTC] Brooklyn, NY |  | °F / °C | Humidity: % | Wind:  mph
 [2026-04-27 07:14:38 UTC] Brooklyn, NY | Clear | 48°F / 9°C | Humidity: 73% | Wind: 2 mph
 [2026-04-27 07:32:36 UTC] Brooklyn, NY | Clear | 48°F / 9°C | Humidity: 73% | Wind: 2 mph
