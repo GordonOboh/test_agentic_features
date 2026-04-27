@@ -1,0 +1,3 @@
+# Schedule Cost Log
+# Format: [YYYY-MM-DD HH:MM:SS UTC] TASK=weather-check | MODEL=haiku | INPUT_TOKENS=n | OUTPUT_TOKENS=n | STATUS=ok
+
